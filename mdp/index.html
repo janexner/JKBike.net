@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en" dir="ltr">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>J-K Bike - Mechanical Disaster Prevention</title>
+        <link rel="stylesheet" href="css/foundation.css">
+        <link rel="stylesheet" href="css/app.css">
+        <link rel="icon" type="image/png" href="/mdp/favicon-96x96.png" sizes="96x96" />
+        <link rel="icon" type="image/svg+xml" href="/mdp/favicon.svg" />
+        <link rel="shortcut icon" href="/mdp/favicon.ico" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/mdp/apple-touch-icon.png" />
+        <link rel="manifest" href="/mdp/site.webmanifest" />
+    </head>
+    <body>
+        <div class="grid-container">
+            <div class="grid-x grid-padding-x">
+                <div class="cell">
+                    <h1>J-K Bike - Mechanical Disaster Prevention</h1>
+                </div>
+            </div>
+            <div class="grid-x">
+                <div class="cell medium-3">
+                    <ul class="vertical tabs" data-tabs id="main-tabs">
+                        <li class="tabs-title is-active"><a href="#panelhome" aria-selected="true">Home</a></li>
+                        <li class="tabs-title"><a href="#panelqr">Quick ride</a></li>
+                        <li class="tabs-title"><a href="#paneldo">Day out</a></li>
+                        <li class="tabs-title"><a href="#panelhols">Holidays</a></li>
+                    </ul>
+                </div>
+                <div class="cell medium-9">
+                    <div class="tabs-content vertical" data-tabs-content="main-tabs">
+                        <div class="tabs-panel is-active" id="panelhome">
+                            <p class="lead">J-K Bike - Mechanical Disaster Prevention helps build positive bike maintenance behaviours, for rides quick, big or epic.</p>
+                            <p>As the authors, even though we take a certain pride in our own efforts in maintaining smooth running MTBs, and a disdain for our riding buddies who never give a passing thought until something goes 'CRUNCH!' in a ride-ending manner, there are still innumerate situations where something that should have been checked, or usually never needs checked after proper installation, has not been.</p>
+                            <p>'Where is that vibration coming from?', 'why is the rear end creaking?', 'What is that terrible knocking?' are so often result of something relatively simple being overlooked or forgotten. Recent favourites have been disc rotor bolts backing out, rear thru axles not done up properly, and headsets improperly tensioned.</p>
+                            <p>So, to prevent mechanical disasters happening on your rides, use this app to build better, new, habits and ensure your rides are (mechanically) glorious.</p>
+                
+                            <h2>App</h2>
+                            <p>If you have an Android phone or tablet, you can <a href="https://www.jan-exner.de/software/android/jkbikemdp">try our app</a></p>
+                
+                            <h2>Let's do this!</h2>
+                            <p>Use one of the three buttons on the left to navigate to the respective list of activities.</p>                
+                        </div>
+                        <div class="tabs-panel" id="panelqr">
+                            <h2>Quick ride</h2>
+                            <p>Quick ride - you are not so far away from a walk out that it is a disaster if something breaks.</p>
+                            <p>These activities help avoid things that will either stop you from riding, or make your ride miserable if not right.</p>
+                            <p class="lead">Best do these the night before!</p>
+                            <h4>Activities for a quick ride:</h4>
+                        </div>
+                        <div class="tabs-panel" id="paneldo">
+                            <h2>Day out</h2>
+                            <p>Day out - you are out for longer time and maybe some distance from easy or fast recovery.</p>
+                            <p>These activities help avoid things are likely not fixable on the trail.</p>
+                            <p class="lead">Best do these the night before or a couple of days earlier!</p>
+                            <h4>Activities for a day out:</h4>
+                        </div>
+                        <div class="tabs-panel" id="panelhols">
+                            <h2>Holidays</h2>
+                            <p>Holidays - you are taking your bike(s) to another place, where you will not have access to all your tools.</p>
+                            <p>Replace components before you go to avoid mishaps due to material fatigue.</p>
+                            <p class="lead">Best start doing these a couple of weeks before!</p>
+                            <h4>Activities for holidays:</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="js/vendor/jquery.js"></script>
+        <script src="js/vendor/what-input.js"></script>
+        <script src="js/vendor/foundation.js"></script>
+        <script src="js/app.js"></script>
+        <script>
+            $(document).foundation();
+            // create eventhandler
+            function handleCheckboxClick(event) {
+                if (event.type = 'click') {
+                    console.log("Event:", event.currentTarget);
+                    const id = event.currentTarget.id;
+                    let uid = id.split("-")[1];
+                    const checked = event.currentTarget.checked;
+                    localStorage.setItem(uid, checked ? "checked" : "");
+                    const now = Date.now();
+                    localStorage.setItem("lastUpdate", now);
+                } else {
+                    // we do not care
+                }
+            }
+            // load templates
+            let allTemplates
+            $.getJSON("./templates/template-activities-en.json", function(data) {
+                allTemplates = data.templateActivities;
+                console.log("Read all JSON: " + allTemplates);
+                // see whether there are lists ongoing
+                const lastUpdate = localStorage.getItem("lastUpdate");
+                const now = Date.now();
+                const useStateFromLocalStorage = ((now - lastUpdate) / 1000 / 3600 / 24 < 2);
+                console.log("Last update in localStorage:", lastUpdate, ". Will use", useStateFromLocalStorage);
+                for (const key in allTemplates) {
+                    if (Object.prototype.hasOwnProperty.call(allTemplates, key)) {
+                        let element = allTemplates[key];
+                        const uid = element.uid;
+                        // check whether there are traces of that in localStorage
+                        const lsFlag = localStorage.getItem(uid);
+                        const uidIsChecked = (lsFlag == "checked");
+                        if (useStateFromLocalStorage) {
+                            element.isCompleted = uidIsChecked;
+                        }
+                        // create list elements
+                        let newHeadlineContent = document.createElement("div");
+                        newHeadlineContent.classList.add("card-divider");
+                        newHeadlineContent.innerHTML = element.title;
+                        let newSupportingContent = document.createElement("div");
+                        newSupportingContent.classList.add("card-section");
+                        let checkedText = uidIsChecked && useStateFromLocalStorage ? " checked " : "";
+                        newSupportingContent.innerHTML = "<input type='checkbox' id='checked-" + element.uid + "'" + checkedText + "/><label for='checked-" + element.uid + "'>" + element.description + "</label>";
+                        // assemble the element and append it
+                        let newContainer = document.createElement("div");
+                        newContainer.classList.add("card");
+                        newContainer.append(newHeadlineContent);
+                        newContainer.append(newSupportingContent);
+                        let paneltype = element.rideLevel == 1 ? "panelqr" : element.rideLevel == 2 ? "paneldo" : "panelhols";
+                        let parentDiv = document.getElementById(paneltype);
+                        parentDiv.append(newContainer);
+                        let input = document.getElementById("checked-" + element.uid);
+                        if (input != null) {
+                            input.addEventListener('click', handleCheckboxClick);
+                        }
+                    }
+                }
+            });
+        </script>
+    </body>
+</html>
