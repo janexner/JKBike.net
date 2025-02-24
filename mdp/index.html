@@ -20,6 +20,12 @@
                     <h1>J-K Bike - Mechanical Disaster Prevention</h1>
                 </div>
             </div>
+            <div class="grid-x grid-padding-x">
+                <div class="cell auto">&nbsp;</div>
+                <div class="cell shrink">
+                    <input type="checkbox" id="eBikeCheck"><label for="eBikeCheck">my bike is an eBike</label>
+                </div>
+            </div>
             <div class="grid-x">
                 <div class="cell medium-3">
                     <ul class="vertical tabs" data-tabs id="main-tabs">
@@ -89,6 +95,19 @@
                     // we do not care
                 }
             }
+            function handleEbikeToggle(event) {
+                if (event.type = 'click') {
+                    const checked = event.currentTarget.checked;
+                    localStorage.setItem("eBike", checked ? "true" : "false");
+                    // TODO
+                }
+            }
+            // set eBike toggle
+            const eBikeToggle = document.getElementById("eBikeCheck");
+            const lsEBike = localStorage.getItem("eBike");
+            const userHasEBike = lsEBike == "true";
+            eBikeToggle.checked = userHasEBike;
+            eBikeToggle.addEventListener('click', handleEbikeToggle);
             // load templates
             let allTemplates
             $.getJSON("./templates/template-activities-en.json", function(data) {
@@ -102,32 +121,35 @@
                 for (const key in allTemplates) {
                     if (Object.prototype.hasOwnProperty.call(allTemplates, key)) {
                         let element = allTemplates[key];
-                        const uid = element.uid;
-                        // check whether there are traces of that in localStorage
-                        const lsFlag = localStorage.getItem(uid);
-                        const uidIsChecked = (lsFlag == "checked");
-                        if (useStateFromLocalStorage) {
-                            element.isCompleted = uidIsChecked;
-                        }
-                        // create list elements
-                        let newHeadlineContent = document.createElement("div");
-                        newHeadlineContent.classList.add("card-divider");
-                        newHeadlineContent.innerHTML = element.title;
-                        let newSupportingContent = document.createElement("div");
-                        newSupportingContent.classList.add("card-section");
-                        let checkedText = uidIsChecked && useStateFromLocalStorage ? " checked " : "";
-                        newSupportingContent.innerHTML = "<input type='checkbox' id='checked-" + element.uid + "'" + checkedText + "/><label for='checked-" + element.uid + "'>" + element.description + "</label>";
-                        // assemble the element and append it
-                        let newContainer = document.createElement("div");
-                        newContainer.classList.add("card");
-                        newContainer.append(newHeadlineContent);
-                        newContainer.append(newSupportingContent);
-                        let paneltype = element.rideLevel == 1 ? "panelqr" : element.rideLevel == 2 ? "paneldo" : "panelhols";
-                        let parentDiv = document.getElementById(paneltype);
-                        parentDiv.append(newContainer);
-                        let input = document.getElementById("checked-" + element.uid);
-                        if (input != null) {
-                            input.addEventListener('click', handleCheckboxClick);
+                        // eBike-relevant?
+                        if (!element.isEBikeSpecific || userHasEBike) {
+                            const uid = element.uid;
+                            // check whether there are traces of that in localStorage
+                            const lsFlag = localStorage.getItem(uid);
+                            const uidIsChecked = (lsFlag == "checked");
+                            if (useStateFromLocalStorage) {
+                                element.isCompleted = uidIsChecked;
+                            }
+                            // create list elements
+                            let newHeadlineContent = document.createElement("div");
+                            newHeadlineContent.classList.add("card-divider");
+                            newHeadlineContent.innerHTML = element.title;
+                            let newSupportingContent = document.createElement("div");
+                            newSupportingContent.classList.add("card-section");
+                            let checkedText = uidIsChecked && useStateFromLocalStorage ? " checked " : "";
+                            newSupportingContent.innerHTML = "<input type='checkbox' id='checked-" + element.uid + "'" + checkedText + "/><label for='checked-" + element.uid + "'>" + element.description + "</label>";
+                            // assemble the element and append it
+                            let newContainer = document.createElement("div");
+                            newContainer.classList.add("card");
+                            newContainer.append(newHeadlineContent);
+                            newContainer.append(newSupportingContent);
+                            let paneltype = element.rideLevel == 1 ? "panelqr" : element.rideLevel == 2 ? "paneldo" : "panelhols";
+                            let parentDiv = document.getElementById(paneltype);
+                            parentDiv.append(newContainer);
+                            let input = document.getElementById("checked-" + element.uid);
+                            if (input != null) {
+                                input.addEventListener('click', handleCheckboxClick);
+                            }
                         }
                     }
                 }
